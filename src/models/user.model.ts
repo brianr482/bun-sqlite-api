@@ -18,27 +18,69 @@ export interface CreateUserDB {
   $bio?: String;
 }
 
+export interface UpdateUserDB {
+  $name?: String;
+  $address?: String;
+  $phone?: String;
+  $bio?: String;
+}
+
+export interface UpdateUserData {
+  name?: String;
+  address?: String;
+  phone?: String;
+  bio?: String;
+}
+
 export class User {
   public static getAll(): User[] {
     return db.query<User, null>('SELECT * FROM user').all(null);
   }
 
-  public static getById(userId: number): User | null {
-    return db.query<User, number>('SELECT * FROM user WHERE id = ?').get(userId);
+  public static getById(userId: number): User | never {
+    const result: User | null = db.query<User, number>('SELECT * FROM user WHERE id = ?').get(userId);
+    if (!result) {
+      throw new NotFoundError(`User does not exist`);
+    }
+
+    return result;
   }
 
   public static deleteById(userId: number): void | never {
-    if (!this.getById(userId)) {
-      throw new NotFoundError(`User does not exist`)
-    }
+    this.getById(userId);
 
-    const result: number | null = db.query<number, number>('DELETE FROM user WHERE id = ? RETURNING *')
+    const result: User | null = db.query<User, number>('DELETE FROM user WHERE id = ? RETURNING *')
       .get(userId);
 
-    if (!result || result === 0) {
+    console.log('result', result);
+
+    if (!result) {
       throw new InternalServerError('User was not deleted successfully.')
     }
 
     return;
+  }
+
+  public static updateById(userId: number, updateData: UpdateUserData): User | null | never {
+    const user: User = this.getById(userId);
+    const updateObj: UpdateUserDB & { $id: number } = {
+      $name: updateData.name ?? user.name,
+      $address: updateData.address ?? user.address,
+      $phone: updateData.phone ?? user.phone,
+      $bio: updateData.bio ?? user.bio,
+      $id: userId,
+    }
+
+    const result: User | null = db.query<User, Record<string, string | number>>(`UPDATE user 
+      SET name = $name, address = $address, bio = $bio, phone = $phone
+      WHERE id = $id
+      RETURNING *`
+    ).get(updateObj as unknown as Record<string, string | number>);
+
+    if (!result) {
+      throw new InternalServerError('User was not updated successfully.');
+    }
+
+    return result;
   }
 }

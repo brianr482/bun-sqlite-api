@@ -12,6 +12,4 @@ db.query(`CREATE TABLE IF NOT EXISTS "user" (
   )`).run();
 db.query('CREATE UNIQUE INDEX IF NOT EXISTS user_id_IDX ON "user" (id);').run();
 
-console.log('HERE');
-
 export default db;
