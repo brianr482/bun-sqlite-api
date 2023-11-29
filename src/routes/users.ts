@@ -3,6 +3,19 @@ import { UserController } from '../controllers/user.controller';
 
 export const usersRoutes = new Elysia()
   .group('/users', app => app
+    .post(
+      '/',
+      ( { body }) => UserController.create(body),
+      {
+        body: t.Object({
+          name: t.String(),
+          email: t.String(),
+          address: t.String(),
+          phone: t.Optional(t.String()),
+          bio: t.Optional(t.String()),
+        })
+      },
+    )
     .get('/', UserController.getAllUsers)
     .delete(
       '/:id',

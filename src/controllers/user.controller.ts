@@ -1,5 +1,5 @@
 
-import { UpdateUserData, User } from '../models/user.model';
+import { CreateUserData, UpdateUserData, User } from '../models/user.model';
 
 export class UserController {
   public static getAllUsers(): User[] {
@@ -16,5 +16,9 @@ export class UserController {
 
   public static updateUserById(userId: number, body: UpdateUserData): User | null | never {
     return User.updateById(userId, body);
+  }
+
+  public static create(body: CreateUserData): User | null | never {
+    return User.create(body);
   }
 }

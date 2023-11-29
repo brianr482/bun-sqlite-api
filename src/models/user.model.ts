@@ -18,6 +18,14 @@ export interface CreateUserDB {
   $bio?: String;
 }
 
+export interface CreateUserData {
+  name: String;
+  email: String;
+  address: String;
+  phone?: String;
+  bio?: String;
+}
+
 export interface UpdateUserDB {
   $name?: String;
   $address?: String;
@@ -69,7 +77,7 @@ export class User {
       $phone: updateData.phone ?? user.phone,
       $bio: updateData.bio ?? user.bio,
       $id: userId,
-    }
+    };
 
     const result: User | null = db.query<User, Record<string, string | number>>(`UPDATE user 
       SET name = $name, address = $address, bio = $bio, phone = $phone
@@ -79,6 +87,28 @@ export class User {
 
     if (!result) {
       throw new InternalServerError('User was not updated successfully.');
+    }
+
+    return result;
+  }
+
+  public static create(createData: CreateUserData): User | null | never {
+    const createObj: CreateUserDB = {
+      $name: createData.name,
+      $email: createData.email,
+      $address: createData.address,
+      $phone: createData.phone,
+      $bio: createData.bio,
+    };
+
+    const result: User | null = db.query<User, Record<string, string>>(`INSERT INTO user
+      (name, email, address, phone, bio)
+      VALUES ($name, $email, $address, $phone, $bio)
+      RETURNING *`
+    ).get(createObj as unknown as Record<string, string>);
+
+    if (!result) {
+      throw new InternalServerError('User was not created successfully.');
     }
 
     return result;
