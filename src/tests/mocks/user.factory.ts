@@ -19,8 +19,6 @@ export class UserFactory {
       Object.entries(this.mockUser(mockWith)).map(([key, value]) => ([`$${key}`, value]))
     ) as CreateUserData;
 
-    console.log('userData', userData);
-
     const result: User | null = db.query<User, Record<string, string>>(`INSERT INTO user
       (name, email, address, phone, bio)
       VALUES ($name, $email, $address, $phone, $bio)

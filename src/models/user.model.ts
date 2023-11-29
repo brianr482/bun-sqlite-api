@@ -60,8 +60,6 @@ export class User {
     const result: User | null = db.query<User, number>('DELETE FROM user WHERE id = ? RETURNING *')
       .get(userId);
 
-    console.log('result', result);
-
     if (!result) {
       throw new InternalServerError('User was not deleted successfully.')
     }
