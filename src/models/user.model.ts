@@ -42,7 +42,7 @@ export interface UpdateUserData {
 
 export class User {
   public static getAll(): User[] {
-    return db.query<User, null>('SELECT * FROM user').all(null);
+    return db.query<User, null>('SELECT * FROM user ORDER BY id ASC').all(null);
   }
 
   public static getById(userId: number): User | never {
