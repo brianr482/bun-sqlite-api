@@ -1,7 +1,7 @@
 import { NotFoundError } from "elysia";
 import { describe, expect, it } from "bun:test";
 import { UserFactory } from "../mocks/user.factory";
-import { User } from "../../models/user.model";
+import { UpdateUserData, User } from "../../models/user.model";
 import db from "../../../db/db";
 
 describe('UserModel', () => {
@@ -64,6 +64,24 @@ describe('UserModel', () => {
 
     it('should return an error if no user\'s records match the given id of user to be deleted', () => {
       expect(() => User.deleteById(-1)).toThrow(new NotFoundError('User does not exist'));
+    });
+  });
+
+  describe('#updateById', () => {
+    it('should delete the user\'s record whose id matches the given id', () => {
+      const mockUser: User = UserFactory.create();
+
+      const updateData: UpdateUserData = { name: 'updated name' };
+      User.updateById(mockUser.id, updateData);
+
+      const userRecord: User | null = db.query<User, number>('SELECT * FROM user WHERE id = ?')
+        .get(mockUser.id);
+
+      expect(userRecord?.name).toEqual(updateData.name as string);
+    });
+
+    it('should return an error if no user\'s records match the given id of user to be updated', () => {
+      expect(() => User.updateById(-1, {})).toThrow(new NotFoundError('User does not exist'));
     });
   });
 });
