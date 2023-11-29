@@ -3,13 +3,15 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "db:seed": "bun ./db/seeders/mock-users.seeder.ts"
   },
   "dependencies": {
-    "elysia": "0.7.29"
+    "@faker-js/faker": "^8.3.1",
+    "elysia": "^0.7.29"
   },
   "devDependencies": {
-    "bun-types": "1.0.14"
+    "bun-types": "^1.0.14"
   },
   "module": "src/index.js"
 }
